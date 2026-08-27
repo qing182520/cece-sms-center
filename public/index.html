@@ -1,0 +1,156 @@
+<!DOCTYPE html><html lang=zh-CN><head><meta charset=UTF-8><meta name=viewport content=width=device-width,initial-scale=1><title>测测登录 - 取码中心</title>
+<style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,"PingFang SC",sans-serif;background:linear-gradient(135deg,#667eea 0%,#764ba2 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:16px}
+.card{background:#fff;border-radius:20px;padding:28px 24px;width:100%;max-width:440px;box-shadow:0 20px 60px rgba(0,0,0,.28)}
+.logo{font-size:28px;font-weight:800;background:linear-gradient(135deg,#667eea,#764ba2);-webkit-background-clip:text;-webkit-text-fill-color:transparent;text-align:center}
+.subtitle{color:#888;font-size:13px;margin:6px 0 24px;text-align:center}
+/* 步骤条 */
+.steps{display:flex;justify-content:space-between;margin-bottom:24px;position:relative;padding:0 6px}
+.steps::before{content:"";position:absolute;top:14px;left:22%;right:22%;height:2px;background:#eee;z-index:0}
+.step{flex:1;display:flex;flex-direction:column;align-items:center;position:relative;z-index:1}
+.dot{width:28px;height:28px;border-radius:50%;background:#eee;color:#aaa;font-weight:700;font-size:13px;display:flex;align-items:center;justify-content:center;border:2px solid #fff;transition:.3s}
+.step.done .dot{background:linear-gradient(135deg,#52c41a,#73d13d);color:#fff}
+.step.active .dot{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;box-shadow:0 0 0 4px rgba(102,126,234,.18)}
+.step-label{font-size:11px;color:#aaa;margin-top:6px;text-align:center}
+.step.done .step-label,.step.active .step-label{color:#555;font-weight:600}
+
+.input-row input{width:100%;padding:14px 16px;border:2px solid #eee;border-radius:12px;font-size:15px;outline:none;margin-bottom:12px;transition:.2s}
+.input-row input:focus{border-color:#667eea}
+.btn{width:100%;padding:14px;border:none;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;margin-top:8px;transition:.2s}
+.btn:active{transform:scale(.98)}
+.btn-p{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff}
+.btn-p:disabled{opacity:.55;cursor:not-allowed}
+.btn-o{background:#fff;color:#667eea;border:2px solid #667eea}
+.btn-s{background:#f3f4f6;color:#555}
+.btn-g{background:#52c41a;color:#fff}
+
+.phone{background:#f0f4ff;border:2px solid #667eea;border-radius:14px;padding:14px 16px;margin:12px 0}
+.phone-val{font-size:26px;font-weight:700;color:#667eea;letter-spacing:2px}
+.wait-card{background:#fff8e6;border:2px dashed #faad14;border-radius:14px;padding:14px;margin:12px 0}
+.wait-title{color:#d48806;font-weight:700;font-size:14px;margin-bottom:8px;display:flex;align-items:center;gap:6px}
+.pulse{width:8px;height:8px;background:#faad14;border-radius:50%;animation:p 1.2s infinite}@keyframes p{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.3;transform:scale(1.4)}}
+.wait-list{font-size:12.5px;color:#806a00;line-height:2}
+.wait-list li{margin-left:18px}
+.wait-list b{color:#d48806}
+
+.sms{background:#f6ffed;border:2px solid #52c41a;border-radius:14px;padding:14px 16px;margin:12px 0}
+.sms-val{font-size:36px;font-weight:800;color:#389e0d;letter-spacing:6px}
+.lb{color:#888;font-size:11px;margin-bottom:4px;display:block}
+.cb{background:#fff;color:#667eea;border:1px solid #667eea;border-radius:8px;padding:5px 12px;cursor:pointer;font-size:12px;margin-top:8px;font-weight:600}
+.cb:active{background:#eef1ff}
+
+.status{margin-top:10px;font-size:13px;text-align:center;font-weight:500}
+.ok{color:#52c41a}.err{color:#ff4d4f}.wait{color:#faad14}.info{color:#1677ff}
+
+.tip{margin-top:14px;padding:12px;background:#f9fafb;border-radius:10px;font-size:12px;color:#888;line-height:1.7}
+.tip b{color:#555}
+.links{margin-top:12px;text-align:center;font-size:12px}
+.links a{color:#bbb;text-decoration:none}
+.countdown{font-size:12px;color:#aaa;margin-top:6px;text-align:center}
+.actions{display:flex;gap:8px;margin-top:4px}
+.actions .btn{margin-top:6px;flex:1;padding:12px;font-size:14px}
+</style></head><body><div class=card>
+<div class=logo>测测取码中心</div>
+<div class=subtitle>账号登录 · 领取新人连麦券</div>
+
+<!-- 步骤条 -->
+<div class=steps id=steps>
+<div class="step active" data-i=1><div class=dot>1</div><div class=step-label>验证账号</div></div>
+<div class=step data-i=2><div class=dot>2</div><div class=step-label>测测获取验证码</div></div>
+<div class=step data-i=3><div class=dot>3</div><div class=step-label>登录并使用券</div></div>
+</div>
+
+<div id=phase-input>
+<div class=input-row><input id=phoneInput type=tel inputmode=numeric maxlength=11 placeholder="请输入管理员发给您的手机号账号"></div>
+<button class=btn btn-p id=verifyBtn onclick=verifyAcc()>立即验证账号</button>
+<div class=tip style=margin-top:14px>💡 未录入的手机号将无法使用此平台，请先联系管理员获取您的专属账号。</div>
+</div>
+
+<div id=phase-result style=display:none>
+<div class=phone>
+<span class=lb>您的账号</span>
+<div class=phone-val id=phoneVal>-</div>
+<button class=cb onclick=copyT('phoneVal')>📋 复制手机号</button>
+</div>
+
+<!-- 等待区 -->
+<div class=wait-card id=waitCard>
+<div class=wait-title><span class=pulse></span>请在测测App里用上方手机号触发验证码</div>
+<ol class=wait-list>
+<li>打开<b>测测App</b> → 选择<b>手机号登录 / 新用户注册</b></li>
+<li>粘贴/输入上方手机号 → 点击<b>「获取验证码」</b>按钮</li>
+<li>验证码通常在<b>10~60 秒</b>内自动显示在此页面</li>
+<li>收到后输入到测测App完成登录，即可自动领取<b>新人连麦券</b></li>
+<li>如长时间未收到，可点「手动查一次」或换号重试</li>
+</ol>
+</div>
+
+<!-- 验证码 -->
+<div class=sms id=smsBox style=display:none>
+<span class=lb>📨 测测登录验证码</span>
+<div class=sms-val id=smsVal>------</div>
+<button class=cb onclick=copyT('smsVal') id=copySms>📋 复制验证码</button>
+</div>
+
+<div class=status id=status class=info>等待触发验证码...</div>
+<div class=countdown id=cd></div>
+
+<div class=actions>
+<button class=btn btn-o onclick=querySms() id=manualQuery>🔎 手动查一次</button>
+<button class=btn btn-s onclick=goBack()>🔙 换一个账号</button>
+</div>
+</div>
+
+<div class=tip>⚠️ <b>账号使用规则：</b>成功显示验证码 → 账号立即标记为已使用；未显示验证码 → 可<b>换一个账号</b>重试。<br>💡 <b>连麦券提示：</b>登录成功后，连麦券自动发放至<b>【我的-我的钱包】</b>查看，5分钟内验证码可重复使用。</div>
+</div>
+
+<script>
+var curPhone,pollTimer,pollCount=0,startTs;
+function $(id){return document.getElementById(id)}
+function setStep(n){document.querySelectorAll(".step").forEach(function(s){var i=+s.dataset.i;s.classList.remove("done","active");if(i<n)s.classList.add("done");if(i===n)s.classList.add("active")})}
+function showP(p){["input","result"].forEach(function(x){document.getElementById("phase-"+x).style.display=x===p?"block":"none"})}
+function fmtTime(t){if(t<60)return t+"秒";return Math.floor(t/60)+"分"+(t%60)+"秒"}
+function cdTimer(){if(!startTs)return;var s=Math.floor((Date.now()-startTs)/1000);$("cd").textContent="已等待："+fmtTime(s);if(s>=330){$("status").textContent="⚠️ 等待已超过5分半，建议换号重试";$("status").className="status err"}}
+
+async function api(url,opts){var r=await fetch(url,Object.assign({headers:{"Content-Type":"application/json"}},opts));return r.json()}
+
+async function verifyAcc(){var phone=$("phoneInput").value.trim().replace(/\D/g,"");if(phone.length!==11){alert("请输入11位手机号");return}curPhone=phone;var btn=$("verifyBtn");btn.disabled=true;btn.textContent="验证中...";
+var r=await api("/api/account/verify",{method:"POST",body:JSON.stringify({phone:phone})});
+btn.disabled=false;btn.textContent="立即验证账号";
+if(!r.ok){alert(r.msg);return}
+if(r.status==="used"){showResult(r.phone,r.sms,"该账号已使用过，验证码已记录")}
+else{startActive(r.phone)}}
+
+function startActive(phone){curPhone=phone;startTs=Date.now();
+$("phoneVal").textContent=phone;$("smsVal").textContent="------";
+$smsBox.style.display="none";$waitCard.style.display="block";$copySms.style.display="none";
+$("status").textContent="✅ 账号有效！现在打开测测App，用上方手机号获取验证码";$("status").className="status wait";
+showP("result");setStep(2);startPoll();setInterval(cdTimer,1000)}
+
+function showResult(phone,code,msg){curPhone=phone;
+$("phoneVal").textContent=phone;$("smsVal").textContent=code||"------";
+$smsBox.style.display=code?"block":"none";$waitCard.style.display=code?"none":"block";$copySms.style.display=code?"inline-block":"none";
+setStep(3);stopPoll();showP("result");
+if(msg){$("status").textContent=msg;$("status").className="status info"}else if(code){$("status").textContent="✅ 验证码已到，去测测App完成登录即可领取新人连麦券";$("status").className="status ok"}}
+
+async function querySms(){var r=await api("/api/account/sms?phone="+encodeURIComponent(curPhone));
+if(r.pending){$("status").textContent="第 "+(pollCount+1)+" 次查询：验证码还在路上...";$("status").className="status wait";return true}
+if(!r.ok){$("status").textContent=r.msg;$("status").className="status err";return false}
+onSmsGot(r.sms);return true}
+function onSmsGot(code){$("smsVal").textContent=code;$smsBox.style.display="block";$waitCard.style.display="none";$copySms.style.display="inline-block";
+$("status").textContent="✅ 验证码已到，在测测App完成登录即可领取新人连麦券";$("status").className="status ok";
+setStep(3);stopPoll()}
+function startPoll(){stopPoll();pollCount=0;pollTimer=setInterval(async function(){pollCount++;
+if(pollCount>=60){$("status").textContent="⏰ 等待超时（已查60次），建议换一个账号重试";$("status").className="status err";stopPoll();return}
+var r=await api("/api/account/sms?phone="+encodeURIComponent(curPhone));
+if(r.pending){$("status").textContent="第 "+pollCount+" 次查询：等待验证码中...";return}
+if(!r.ok){$("status").textContent=r.msg;$("status").className="status err";stopPoll();return}
+onSmsGot(r.sms)},5000)}
+function stopPoll(){if(pollTimer){clearInterval(pollTimer);pollTimer=null}}
+
+function goBack(){stopPoll();curPhone=null;startTs=null;$("cd").textContent="";
+$("phoneVal").textContent="-";$("smsVal").textContent="------";$smsBox.style.display="none";$waitCard.style.display="block";
+$copySms.style.display="none";showP("input");setStep(1);$("phoneInput").focus();$("phoneInput").value=""}
+function copyT(id){var v=$(id).textContent;navigator.clipboard.writeText(v).then(function(){alert("✅ 已复制："+v)})}
+var $smsBox,$waitCard,$copySms;document.addEventListener("DOMContentLoaded",function(){$smsBox=$("smsBox");$waitCard=$("waitCard");$copySms=$("copySms")});
+$("phoneInput").addEventListener("keydown",function(e){if(e.key==="Enter")verifyAcc()});
+</script></body></html>
