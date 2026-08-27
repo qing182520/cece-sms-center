@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang=zh-CN>
+<head>
+<meta charset=UTF-8>
+<meta name=viewport content=width=device-width,initial-scale=1>
+<title>管理后台-测测账号系统</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#f5f7fa;min-height:100vh}
+.login-wrap{display:flex;align-items:center;justify-content:center;min-height:100vh;background:linear-gradient(135deg,#667eea,#764ba2)}
+.login-box{background:#fff;border-radius:16px;padding:40px;width:360px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.login-box h1{font-size:24px;font-weight:700;color:#333;text-align:center;margin-bottom:24px}
+.form-item{margin-bottom:16px}
+.form-item label{display:block;font-size:14px;color:#666;margin-bottom:6px}
+.form-item input,.form-item select{width:100%;padding:12px 16px;border:1px solid #ddd;border-radius:8px;font-size:14px;outline:none}
+.form-item input:focus,.form-item select:focus{border-color:#667eea}
+.btn{padding:12px 20px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;margin-top:8px}
+.btn-p{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;width:100%}
+.btn-p:disabled{opacity:.6}
+.btn-s{background:#f0f0f0;color:#666}
+.btn-d{background:#ff4d4f;color:#fff}
+.btn-g{background:#52c41a;color:#fff}
+.btn-o{background:#fff;color:#667eea;border:1px solid #667eea}
+.btn-sm{padding:6px 12px;font-size:12px;margin:2px}
+.layout{display:flex;min-height:100vh}
+.sidebar{width:220px;background:#1f2937;color:#fff;padding:20px 0}
+.sidebar h2{font-size:18px;padding:0 20px 20px;border-bottom:1px solid #374151;margin-bottom:20px}
+.sidebar a{display:block;padding:12px 20px;color:#d1d5db;text-decoration:none;font-size:14px;cursor:pointer;border-left:3px solid transparent}
+.sidebar a:hover,.sidebar a.active{background:#374151;color:#fff;border-left-color:#667eea}
+.main{flex:1;padding:24px;overflow-y:auto}
+.header{display:flex;justify-content:space-between;align-items:center;margin-bottom:24px}
+.header h1{font-size:22px;font-weight:700;color:#333}
+.header .user{color:#666;font-size:14px}
+.card{background:#fff;border-radius:12px;padding:20px;margin-bottom:20px;box-shadow:0 1px 3px rgba(0,0,0,.1)}
+.card h3{font-size:16px;font-weight:600;color:#333;margin-bottom:16px;padding-bottom:12px;border-bottom:1px solid #f0f0f0}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:16px}
+.stat-item{background:linear-gradient(135deg,#667eea,#764ba2);color:#fff;border-radius:12px;padding:20px;text-align:center}
+.stat-item .num{font-size:32px;font-weight:700}
+.stat-item .label{font-size:13px;opacity:.9;margin-top:4px}
+.stat-item.green{background:linear-gradient(135deg,#52c41a,#73d13d)}
+.stat-item.gray{background:linear-gradient(135deg,#6b7280,#9ca3af)}
+.stat-item.orange{background:linear-gradient(135deg,#f59e0b,#fbbf24)}
+.row{display:flex;gap:12px;align-items:center;flex-wrap:wrap}
+.row input,.row select{padding:8px 12px;border:1px solid #ddd;border-radius:6px;font-size:14px;outline:none}
+.row input:focus,.row select:focus{border-color:#667eea}
+.table{width:100%;border-collapse:collapse}
+.table th,.table td{padding:10px 12px;text-align:left;font-size:13px;border-bottom:1px solid #f0f0f0}
+.table th{background:#f9fafb;color:#666;font-weight:600}
+.badge{padding:2px 8px;border-radius:10px;font-size:12px}
+.badge-green{background:#d1fae5;color:#065f46}
+.badge-gray{background:#f3f4f6;color:#374151}
+.badge-red{background:#fee2e2;color:#991b1b}
+.badge-yellow{background:#fef3c7;color:#92400e}
+.textarea{width:100%;min-height:200px;padding:12px;border:1px solid #ddd;border-radius:8px;font-family:monospace;font-size:13px;resize:vertical}
+.hidden{display:none!important}
+.toast{position:fixed;top:20px;right:20px;padding:12px 20px;background:#333;color:#fff;border-radius:8px;z-index:9999;animation:fadeIn .3s}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-20px)}to{opacity:1;transform:translateY(0)}}
+input[type=number]{width:120px}
+input[type=password]{width:200px}
+.queue-item{background:#fffbe6;border:1px solid #ffe58f;border-radius:10px;padding:14px 16px;margin-bottom:12px;transition:.2s}
+.queue-item:hover{box-shadow:0 2px 10px rgba(0,0,0,.08)}
+.q-row{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:8px;flex-wrap:wrap}
+.q-phone{font-size:22px;font-weight:700;color:#667eea;letter-spacing:1px}
+.q-card{font-size:12px;color:#888;font-family:monospace}
+.q-time{font-size:12px;color:#d48806}
+.q-actions{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.q-actions input{padding:8px 12px;border:1px solid #ddd;border-radius:6px;outline:none;font-size:14px;letter-spacing:2px;width:130px}
+.empty{text-align:center;color:#aaa;padding:40px 20px;font-size:14px}
+.q-done{background:#f6ffed;border-color:#b7eb8f}
+.q-done .q-phone{color:#52c41a}
+.tag-badge{padding:2px 8px;border-radius:4px;font-size:12px;background:#eef2ff;color:#4338ca}
+.pagination{display:flex;gap:8px;justify-content:center;margin-top:16px;align-items:center}
+.pagination button{padding:6px 12px;border:1px solid #ddd;background:#fff;border-radius:6px;cursor:pointer;font-size:12px}
+.pagination button:disabled{opacity:.4;cursor:not-allowed}
+.pagination button.active{background:#667eea;color:#fff;border-color:#667eea}
+</style>
+</head>
+<body>
+<div id=loginPage class=login-wrap>
+<div class=login-box>
+<h1>🔐 管理后台</h1>
+<div class=form-item><label>账号</label><input id=loginUser placeholder=请输入账号></div>
+<div class=form-item><label>密码</label><input id=loginPass type=password placeholder=请输入密码></div>
+<button class=btn btn-p onclick=doLogin()>登录</button>
+</div>
+</div>
+
+<div id=adminPage class=hidden>
+<div class=layout>
+<div class=sidebar>
+<h2>📱 测测账号系统</h2>
+<a class=active onclick="showTab('accounts',this)">📱 账号库管理</a>
+<a onclick="showTab('queue',this)">🎯 实时查码面板</a>
+<a onclick="showTab('users',this)">👥 管理员账号</a>
+<a onclick="showTab('settings',this)">⚙️ API设置</a>
+<a onclick=doLogout()>🚪 退出</a>
+</div>
+<div class=main>
+<div class=header><h1 id=pageTitle>账号库管理</h1><div class=user>欢迎: <span id=curUser></span></div></div>
+<div class=stats>
+<div class=stat-item><div class=num id=stTotal>0</div><div class=label>账号总数</div></div>
+<div class=stat-item green><div class=num id=stUnused>0</div><div class=label>未使用</div></div>
+<div class=stat-item orange><div class=num id=stActive>0</div><div class=label>查码中</div></div>
+<div class=stat-item gray><div class=num id=stUsed>0</div><div class=label>已使用</div></div>
+</div>
+
+<!-- ============ 账号库管理 ============ -->
+<div id=tab-accounts>
+<div class=card>
+<h3>📥 单个录入账号</h3>
+<div class=row>
+<input id=accPhone placeholder="手机号 11位" maxlength=11 style=width:180px>
+<input id=accRemark placeholder="备注（可选）" style=width:240px>
+<button class="btn btn-sm btn-p" onclick=addAcc()>➕ 录入</button>
+</div>
+</div>
+
+<div class=card>
+<h3>📤 批量录入（粘贴）</h3>
+<div style=font-size:12.5px;color:#888;margin-bottom:10px>每行一个手机号，或逗号/空格/分号/回车分隔；自动去重，自动过滤非手机号。</div>
+<textarea class=textarea id=batchText placeholder="13800138000&#10;13900139000&#10;13700137000"></textarea>
+<div class=row>
+<input id=batchRemark placeholder="批量备注（可选，会应用到这批所有号）" style=width:280px>
+<button class="btn btn-sm btn-p" onclick=batchAdd()>批量录入</button>
+</div>
+</div>
+
+<div class=card>
+<h3>🎲 一键从豪猪取号入库</h3>
+<div style=font-size:12.5px;color:#888;margin-bottom:10px>自动调用豪猪API取号并直接录入账号库，省去手动录号。每个号消耗豪猪1次取号费。</div>
+<div class=row>
+<input id=fetchCount type=number value=5 min=1 max=500 style=width:120px> <span style=color:#888;font-size:12px>个</span>
+<button class="btn btn-sm btn-p" onclick=autoFetch()>🚀 立即取号入库</button>
+<span id=fetchResult style=color:#52c41a;font-size:13px></span>
+</div>
+</div>
+
+<div class=card>
+<h3>📊 账号列表</h3>
+<div class=row>
+<select id=filterAccStatus>
+<option value=>全部状态</option>
+<option value=unused>未使用</option>
+<option value=active>查码中</option>
+<option value=used>已使用</option>
+</select>
+<input id=filterAccKeyword placeholder="搜索手机号/备注" style=width:240px>
+<button class="btn btn-sm btn-p" onclick=loadAccounts(1)>🔍 搜索</button>
+<button class="btn btn-sm btn-g" onclick=exportUnused()>📋 复制全部未用手机号</button>
+<button class="btn btn-sm btn-d" onclick=deleteSelectedAcc()><span id=accSelCount>0</span> 条选中删除</button>
+</div>
+<table class=table>
+<thead><tr>
+<th><input type=checkbox onclick=toggleAllAcc(this)></th>
+<th>ID</th><th>手机号</th><th>状态</th><th>验证码</th><th>备注</th><th>创建时间</th><th>使用时间</th><th>操作</th>
+</tr></thead>
+<tbody id=accTbody></tbody>
+</table>
+<div class=pagination id=accPager></div>
+</div>
+</div>
+
+<!-- ============ 实时查码面板 ============ -->
+<div id=tab-queue class=hidden>
+<div class=card>
+<h3>🎯 查码中列表 <button class="btn btn-sm btn-s" onclick=loadAccountQueue() style=float:right>🔄 刷新</button>
+<span style=float:right;font-size:12px;color:#888;margin:4px 10px><label><input type=checkbox id=aqAuto checked> 自动刷新(10s)</label></span>
+</h3>
+<div style=font-size:12.5px;color:#888;margin-bottom:14px;line-height:1.8>
+<b>📱 使用说明：</b>下方 = 正在查码中的账号（用户在前端验证账号后开始等待验证码）。<br>
+1️⃣ 用户会在前端看到操作指引，自行打开<b>测测App</b> → 输入手机号 → 点击<b>获取验证码</b><br>
+2️⃣ 验证码自动显示在用户前端（豪猪API查询），也可以在此页面手动注入验证码。
+</div>
+<div id=accQueueList></div>
+</div>
+
+<div class=card>
+<h3>💉 手动注入验证码（任意手机号）</h3>
+<div style=font-size:12.5px;color:#888;margin-bottom:10px>测试或手动触发时使用：给某个手机号直接输入验证码 → 该手机号立即标记"已使用"，用户前端自动显示。</div>
+<div class=row>
+<input id=injPhone placeholder="手机号 11位" maxlength=11 style=width:160px>
+<input id=injCode placeholder="4-8位验证码" maxlength=8 style=width:160px>
+<button class="btn btn-sm btn-g" onclick=injectAcc()>注入</button>
+</div>
+</div>
+</div>
+
+<!-- ============ 管理员账号 ============ -->
+<div id=tab-users class=hidden>
+<div class=card>
+<h3>👤 添加管理员</h3>
+<div class=row>
+<input id=newUser placeholder=用户名>
+<input id=newPass placeholder=密码>
+<button class="btn btn-sm btn-p" onclick=addUser()>添加</button>
+</div>
+</div>
+<div class=card>
+<h3>👥 管理员列表</h3>
+<table class=table>
+<thead><tr><th>用户名</th><th>创建时间</th><th>操作</th></tr></thead>
+<tbody id=usersTbody></tbody>
+</table>
+</div>
+</div>
+
+<!-- ============ API设置 ============ -->
+<div id=tab-settings class=hidden>
+<div class=card>
+<h3>🔑 API 凭据设置</h3>
+<div class=form-item><label>API 账号</label><input id=apiUser></div>
+<div class=form-item><label>API 密码</label><input id=apiPass></div>
+<div class=form-item><label>项目 ID（测测=61510）</label><input id=itemId></div>
+<div class=row>
+<button class="btn btn-sm btn-p" onclick=saveSettings()>💾 保存设置</button>
+<button class="btn btn-sm btn-s" onclick=checkBalance()>💰 查询余额</button>
+</div>
+</div>
+<div class=card>
+<h3>📝 修改当前用户密码</h3>
+<div class=row>
+<input id=newPwd type=password placeholder=新密码>
+<button class="btn btn-sm btn-p" onclick=changePwd()>修改密码</button>
+</div>
+</div>
+</div>
+
+</div>
+</div>
+</div>
+</div>
+
+<script>
+let token=null;
+let accPage=1,accPageSize=20,accTotal=0;
+let allAccIds=new Set();
+function $(id){return document.getElementById(id)}
+function toast(msg){var d=document.createElement('div');d.className='toast';d.textContent=msg;document.body.appendChild(d);setTimeout(function(){d.remove()},2500)}
+async function api(url,opts){var h={'Content-Type':'application/json'};if(token)h['x-admin-token']=token;var r=await fetch(url,Object.assign({headers:h},opts||{}));return r.json()}
+async function doLogin(){var u=$('loginUser').value.trim();var p=$('loginPass').value;if(!u||!p)return toast('请输入账号密码');var r=await api('/admin/api/login',{method:'POST',body:JSON.stringify({username:u,password:p})});if(!r.ok)return toast(r.msg);token=r.token;$('curUser').textContent=r.username;$('loginPage').classList.add('hidden');$('adminPage').classList.remove('hidden');loadAccStats();loadAccounts(1);loadSettings();loadUsers()}
+function doLogout(){token=null;window.location.reload()}
+function showTab(name,a){document.querySelectorAll('#adminPage .sidebar a').forEach(function(x){x.classList.remove('active')});if(a)a.classList.add('active');['accounts','queue','users','settings'].forEach(function(t){$('tab-'+t).classList.toggle('hidden',t!==name)});var titles={accounts:'账号库管理',queue:'实时查码面板',users:'管理员账号',settings:'API设置'};$('pageTitle').textContent=titles[name]||name;if(name==='users')loadUsers();if(name==='settings')loadSettings();if(name==='accounts'){loadAccStats();loadAccounts(1)};if(name==='queue')loadAccountQueue()}
+
+// ========== 账号库 ==========
+async function loadAccStats(){var r=await api('/admin/api/accounts/stats');$('stTotal').textContent=r.total||0;$('stUnused').textContent=r.unused||0;$('stActive').textContent=r.active||0;$('stUsed').textContent=r.used||0}
+async function addAcc(){var p=$('accPhone').value.trim().replace(/\D/g,'');var rm=$('accRemark').value.trim();if(p.length!==11)return toast('请输入11位手机号');var r=await api('/admin/api/accounts/add',{method:'POST',body:JSON.stringify({phone:p,remark:rm})});toast(r.msg);if(r.ok){$('accPhone').value='';$('accRemark').value='';loadAccStats();loadAccounts(accPage)}}
+async function batchAdd(){var text=$('batchText').value.trim();var rm=$('batchRemark').value.trim();if(!text)return toast('请输入内容');var r=await api('/admin/api/accounts/batch',{method:'POST',body:JSON.stringify({text,remark:rm})});if(!r.ok)return toast(r.msg);toast('成功录入 '+r.added+' / '+r.total+' 个（重复已忽略）');$('batchText').value='';$('batchRemark').value='';loadAccStats();loadAccounts(accPage)}
+async function autoFetch(){var n=parseInt($('fetchCount').value)||1;if(n<1||n>500)return toast('数量1-500');if(!confirm('将调用豪猪API取 '+n+' 个号并录入账号库，将消耗豪猪余额。确定？'))return;$('fetchResult').textContent='取号中...';var r=await api('/admin/api/accounts/auto-fetch',{method:'POST',body:JSON.stringify({count:n})});$('fetchResult').textContent='成功 '+r.added+' 个，失败 '+r.failed+' 个';toast('成功取号 '+r.added+' 个');loadAccStats();loadAccounts(1)}
+async function loadAccounts(page){accPage=page||1;var s=$('filterAccStatus').value;var k=$('filterAccKeyword').value.trim();var u='/admin/api/accounts?page='+accPage+'&pageSize='+accPageSize;if(s)u+='&status='+s;if(k)u+='&keyword='+encodeURIComponent(k);var r=await api(u);accTotal=r.total;var tb=$('accTbody');tb.innerHTML='';allAccIds.clear();(r.rows||[]).forEach(function(c,i){allAccIds.add(c.id);var st='';if(c.status==='unused')st='<span class="badge badge-green">未使用</span>';else if(c.status==='active')st='<span class="badge badge-yellow">查码中</span>';else st='<span class="badge badge-gray">已使用</span>';
+var tr=document.createElement('tr');tr.innerHTML='<td><input type="checkbox" class="accCb" data-id="'+c.id+'" onchange=updateAccSel()></td>'
++'<td>'+c.id+'</td>'
++'<td style="font-weight:700;letter-spacing:1px">'+c.phone+'</td>'
++'<td>'+st+'</td>'
++'<td style="color:#389e0d;font-weight:700;letter-spacing:2px">'+(c.sms_code||'-')+'</td>'
++'<td style="color:#888;font-size:12px">'+(c.remark||'-')+'</td>'
++'<td>'+new Date(c.created_at).toLocaleString()+'</td>'
++'<td>'+(c.used_at?new Date(c.used_at).toLocaleString():'-')+'</td>'
++'<td>'
++(c.status!=='used'?'<button class="btn btn-sm btn-o" onclick=pollOneAcc("'+c.phone+'")>🔎查码</button> ':'')
++'<button class="btn btn-sm btn-d" onclick=delOneAcc('+c.id+')>删除</button></td>';
+tb.appendChild(tr)});updateAccSel();
+// 分页
+var totalPages=Math.max(1,Math.ceil(accTotal/accPageSize));
+var pg=$('accPager');var html='';html+='<span style="font-size:12px;color:#888;margin-right:12px">共 '+accTotal+' 条 / '+totalPages+' 页</span>';
+html+='<button onclick=loadAccounts('+(accPage-1)+') '+(accPage<=1?'disabled':'')+'>上一页</button>';
+var s=Math.max(1,accPage-3),e=Math.min(totalPages,accPage+3);
+for(var i=s;i<=e;i++)html+='<button class="'+(i===accPage?'active':'')+'" onclick=loadAccounts('+i+')>'+i+'</button>';
+html+='<button onclick=loadAccounts('+(accPage+1)+') '+(accPage>=totalPages?'disabled':'')+'>下一页</button>';
+pg.innerHTML=html}
+function toggleAllAcc(el){document.querySelectorAll('#accTbody input.accCb').forEach(function(x){x.checked=el.checked});updateAccSel()}
+function updateAccSel(){var c=document.querySelectorAll('#accTbody input.accCb:checked').length;$('accSelCount').textContent=c}
+async function deleteSelectedAcc(){var ids=[];document.querySelectorAll('#accTbody input.accCb:checked').forEach(function(x){ids.push(Number(x.dataset.id))});if(!ids.length)return toast('未选中任何账号');if(!confirm('确定删除 '+ids.length+' 个账号？'))return;var r=await api('/admin/api/accounts/delete',{method:'POST',body:JSON.stringify({ids})});toast('已删除 '+r.deleted+' 个');loadAccStats();loadAccounts(accPage)}
+async function delOneAcc(id){if(!confirm('确定删除此账号？'))return;var r=await api('/admin/api/accounts/delete',{method:'POST',body:JSON.stringify({ids:[id]})});toast('已删除 '+r.deleted);loadAccStats();loadAccounts(accPage)}
+async function pollOneAcc(phone){try{var r=await fetch('/api/account/sms?phone='+encodeURIComponent(phone));var d=await r.json();if(d.pending)return toast('暂无验证码，等待中...');if(d.ok)toast('✅ 查到验证码: '+d.sms+'，已标记已使用');else toast('查码失败: '+d.msg);loadAccStats();loadAccounts(accPage)}catch(e){toast('查码异常')}}
+async function exportUnused(){var s='unused',k='';var u='/admin/api/accounts?page=1&pageSize=10000&status=unused';var r=await api(u);var phones=(r.rows||[]).map(function(x){return x.phone});if(!phones.length)return toast('暂无未使用账号');navigator.clipboard.writeText(phones.join('\n')).then(function(){toast('已复制 '+phones.length+' 个未使用手机号到剪贴板')})}
+
+// ========== 查码面板 ==========
+function elasped(ms){if(!ms)return'-';var s=Math.floor(ms/1000);if(s<60)return s+'秒';if(s<3600)return Math.floor(s/60)+'分'+(s%60)+'秒';return Math.floor(s/3600)+'时'+Math.floor((s%3600)/60)+'分'}
+async function loadAccountQueue(){var r=await api('/admin/api/accounts?page=1&pageSize=200&status=active');var list=(r.rows||[]).sort(function(a,b){return(b.updated_at||0)-(a.updated_at||0)});var box=$('accQueueList');if(!list.length){box.innerHTML='<div class=empty>✨ 暂无查码中的账号，等待用户在前端验证账号...</div>';return}
+var now=Date.now(),html='';
+list.forEach(function(o,i){var age=now-(o.updated_at||o.created_at);html+='<div class=queue-item>'
++'<div class=q-row>'
++'<div><div class=q-phone onclick="copyT(this)">'+o.phone+'</div>'
++'<div class=q-card>ID: '+o.id+(o.remark?' · 备注: '+o.remark:'')+'</div></div>'
++'<div style=text-align:right><div class=q-time>📅 '+new Date(o.updated_at||o.created_at).toLocaleString()+'</div>'
++'<div class=q-time>⏱️ 已等待 '+elasped(age)+'</div></div></div>'
++'<div class=q-actions>'
++'<button class="btn btn-sm btn-s" onclick="copyPhone(\''+o.phone+'\')">📋 复制手机号</button>'
++'<button class="btn btn-sm btn-p" onclick="pollOneAcc(\''+o.phone+'\')">🔎 立即查码</button>'
++'<input id=ai-'+o.id+' placeholder=手动输入6位验证码 maxlength=6>'
++'<button class="btn btn-sm btn-g" onclick="injAccBtn(\''+o.phone+'\','+o.id+')">💉 注入验证码</button>'
++'</div></div>'});
+box.innerHTML=html}
+async function injAccBtn(p,id){var code=$('ai-'+id).value.trim();if(!/^\d{4,8}$/.test(code))return toast('请输入4-8位数字验证码');if(!confirm('确定给手机号 '+p+' 注入验证码【'+code+'】？\n注入后此手机号立即标记为已使用，用户前端自动显示。'))return;var r=await api('/admin/api/accounts/inject',{method:'POST',body:JSON.stringify({phone:p,code})});toast(r.msg);if(r.ok){loadAccountQueue();loadAccStats();loadAccounts(accPage)}}
+async function injectAcc(){var p=$('injPhone').value.trim().replace(/\D/g,'');var code=$('injCode').value.trim();if(p.length!==11)return toast('手机号格式错误');if(!/^\d{4,8}$/.test(code))return toast('验证码4-8位数字');if(!confirm('确定给手机号 '+p+' 注入验证码【'+code+'】？'))return;var r=await api('/admin/api/accounts/inject',{method:'POST',body:JSON.stringify({phone:p,code})});toast(r.msg);if(r.ok){$('injPhone').value='';$('injCode').value='';loadAccStats();loadAccounts(accPage);loadAccountQueue()}}
+function copyPhone(p){navigator.clipboard.writeText(p).then(function(){toast('已复制: '+p)})}
+function copyT(el){navigator.clipboard.writeText(el.textContent).then(function(){toast('已复制')})}
+
+// ========== 管理员账号 ==========
+async function addUser(){var u=$('newUser').value.trim();var p=$('newPass').value;if(!u||!p)return toast('请输入用户名和密码');var r=await api('/admin/api/users',{method:'POST',body:JSON.stringify({username:u,password:p})});toast(r.msg);if(r.ok){$('newUser').value='';$('newPass').value='';loadUsers()}}
+async function loadUsers(){var r=await api('/admin/api/users');if(!r.ok)return;var tb=$('usersTbody');tb.innerHTML='';r.users.forEach(function(u){var tr=document.createElement('tr');tr.innerHTML='<td>'+u.username+'</td><td>'+new Date(u.created_at).toLocaleString()+'</td><td><button class="btn btn-sm btn-p" onclick="setPwd(\''+u.username+'\')">改密</button> <button class="btn btn-sm btn-d" onclick="delUser(\''+u.username+'\')">删除</button></td>';tb.appendChild(tr)})}
+async function setPwd(u){var p=prompt('请输入 '+u+' 的新密码');if(!p)return;var r=await api('/admin/api/users/'+encodeURIComponent(u)+'/password',{method:'PUT',body:JSON.stringify({password:p})});toast(r.ok?'修改成功':'修改失败')}
+async function delUser(u){if(u===$('curUser').textContent)return toast('不能删除自己');if(!confirm('确定删除账号 '+u+'？'))return;var r=await api('/admin/api/users/'+encodeURIComponent(u),{method:'DELETE'});toast(r.ok?'删除成功':'删除失败');if(r.ok)loadUsers()}
+
+// ========== API设置 ==========
+async function loadSettings(){var r=await api('/admin/api/settings');if(r.ok){$('apiUser').value=r.api_user;$('apiPass').value=r.api_pass;$('itemId').value=r.item_id}}
+async function saveSettings(){var r=await api('/admin/api/settings',{method:'POST',body:JSON.stringify({api_user:$('apiUser').value,api_pass:$('apiPass').value,item_id:$('itemId').value})});toast(r.ok?'保存成功':'保存失败')}
+async function checkBalance(){try{var r=await api('/admin/api/balance');toast(r.error?r.error:JSON.stringify(r))}catch(e){toast('查询失败')}}
+async function changePwd(){var p=$('newPwd').value;if(!p)return toast('请输入新密码');var r=await api('/admin/api/users/'+encodeURIComponent($('curUser').textContent)+'/password',{method:'PUT',body:JSON.stringify({password:p})});toast(r.ok?'修改成功':'修改失败');$('newPwd').value=''}
+
+setInterval(function(){if($('aqAuto')&&$('aqAuto').checked&&!$('tab-queue').classList.contains('hidden'))loadAccountQueue()},10000);
+document.getElementById('loginPass').addEventListener('keydown',function(e){if(e.key==='Enter')doLogin()});
+</script>
+</body>
+</html>
